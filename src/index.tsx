@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-rfid8500-zebra' doesn't seem to be linked. Make sure: \n\n` +
@@ -17,6 +17,34 @@ const Rfid8500Zebra = NativeModules.Rfid8500Zebra
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Rfid8500Zebra.multiply(a, b);
-}
+const eventEmitter = new NativeEventEmitter();
+
+console.log(eventEmitter)
+
+const events: any = {};
+
+Rfid8500Zebra.on = (event: any, handler: any) => {
+  const eventListener = eventEmitter.addListener(event, handler);
+
+  events[event] = events[event]
+    ? [...events[event], eventListener]
+    : [eventListener];
+};
+
+Rfid8500Zebra.off = (event: any) => {
+  if (Object.hasOwnProperty.call(events, event)) {
+    const eventListener = events[event].shift();
+
+    if (eventListener) eventListener.remove();
+  }
+};
+
+Rfid8500Zebra.removeAll = (event: any) => {
+  if (Object.hasOwnProperty.call(events, event)) {
+    eventEmitter.removeAllListeners(event);
+
+    events[event] = [];
+  }
+};
+
+export default Rfid8500Zebra;
