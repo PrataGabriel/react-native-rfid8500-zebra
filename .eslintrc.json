@@ -1,0 +1,60 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true,
+        "jest": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true,
+            "tsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "react-native",
+        "@typescript-eslint",
+        "prettier"
+    ],
+    "rules": {
+        "react/react-in-jsx-scope": "off",
+        "camelcase": "error",
+        "spaced-comment": "error",
+        "quotes": ["error", "single"],
+        "no-duplicate-imports": "error",
+        "consistent-return": 2,
+        "indent"           : ["error", 2],
+        "no-else-return"   : 1,
+        "space-unary-ops"  : 2,
+        "key-spacing": [2, {
+            "singleLine": {
+                "beforeColon": false,
+                "afterColon": true
+            },
+            "multiLine": {
+                "beforeColon": false,
+                "afterColon": true
+            }
+        }],
+        "semi": ["error", "never"],
+        "no-console": ["error", { "allow": ["warn", "error"] }],
+        "array-callback-return": "error",
+        "eqeqeq": ["error", "always"],
+        "logical-assignment-operators": ["error", "always"],
+        "keyword-spacing": ["error", { "after": true }],
+        "multiline-ternary": ["error", "always"],
+        "no-multi-spaces": "error"
+    }
+}
