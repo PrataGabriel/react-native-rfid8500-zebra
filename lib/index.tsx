@@ -1,4 +1,5 @@
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native'
+import type { Rfid8500ZebraType, EventsType } from './typescript/index.d.ts'
 
 const LINKING_ERROR =
   'The package \'react-native-rfid8500-zebra\' doesn\'t seem to be linked. Make sure: \n\n' +
@@ -6,7 +7,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n'
 
-const Rfid8500Zebra = NativeModules.Rfid8500Zebra
+const Rfid8500Zebra: typeof Rfid8500ZebraType = NativeModules.Rfid8500Zebra
   ? NativeModules.Rfid8500Zebra
   : new Proxy(
     {},
@@ -19,19 +20,17 @@ const Rfid8500Zebra = NativeModules.Rfid8500Zebra
 
 const eventEmitter = new NativeEventEmitter()
 
-const events: any = {}
+const events: EventsType = {}
 
-Rfid8500Zebra.on = (event: string, handler: (data: any) => void) => {
+Rfid8500Zebra.on = (event, handler) => {
   const eventListener = eventEmitter.addListener(event, handler)
 
-  events[event] = events[event]
-    ? [...events[event], eventListener]
-    : [eventListener]
+  events[event] = [...(events[event] || []), eventListener]
 }
 
-Rfid8500Zebra.off = (event: string) => {
+Rfid8500Zebra.off = (event) => {
   if (Object.hasOwnProperty.call(events, event)) {
-    const eventListener = events[event].shift()
+    const eventListener = events[event]?.shift()
 
     if (eventListener) eventListener.remove()
   }
