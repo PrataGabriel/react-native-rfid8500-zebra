@@ -65,3 +65,6 @@ android/keystores/debug.keystore
 
 # Turborepo
 .turbo/
+
+# bob
+.lib/
