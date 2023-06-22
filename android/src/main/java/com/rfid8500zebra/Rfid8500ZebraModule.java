@@ -1084,11 +1084,4 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
     }
     return false;
   }
-
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
-  @ReactMethod
-  public void multiply(double a, double b, Promise promise) {
-    promise.resolve(a * b);
-  }
 }
