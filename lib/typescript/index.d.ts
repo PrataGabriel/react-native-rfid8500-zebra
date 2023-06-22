@@ -1,4 +1,4 @@
-declare module 'Rfid8500Zebra' {
+declare module 'react-native-rfid8500-zebra' {
   interface handlerType {
     error?: string
     status?: boolean
@@ -16,7 +16,7 @@ declare module 'Rfid8500Zebra' {
     antennaLevel?: number
   }
 
-  declare const Rfid8500Zebra: {
+  declare const RfidZebra: {
     on: (event: string, handler: (data: string | string[] | handlerType) => void) => void
     off: (event: string) => void
     removeAll: (event: string) => void
@@ -36,6 +36,6 @@ declare module 'Rfid8500Zebra' {
     setSession: (session: number) => Promise<boolean>
   }
   
-  export default Rfid8500Zebra
+  export default RfidZebra
 }
 // # sourceMappingURL=index.d.ts.map

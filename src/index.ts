@@ -1,5 +1,5 @@
 import { NativeModules, NativeEventEmitter, Platform, EmitterSubscription } from 'react-native'
-import type Rfid8500ZebraType from 'Rfid8500Zebra'
+import type RfidZebraType from 'react-native-rfid8500-zebra'
 
 export interface EventsType {
   [key: string]: EmitterSubscription[]
@@ -11,7 +11,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n'
 
-const Rfid8500Zebra: typeof Rfid8500ZebraType = NativeModules.Rfid8500Zebra
+const RfidZebra: typeof RfidZebraType = NativeModules.Rfid8500Zebra
   ? NativeModules.Rfid8500Zebra
   : new Proxy(
     {},
@@ -26,13 +26,13 @@ const eventEmitter = new NativeEventEmitter()
 
 const events: EventsType = {}
 
-Rfid8500Zebra.on = (event, handler) => {
+RfidZebra.on = (event, handler) => {
   const eventListener = eventEmitter.addListener(event, handler)
 
   events[event] = [...(events[event] || []), eventListener]
 }
 
-Rfid8500Zebra.off = (event) => {
+RfidZebra.off = (event) => {
   if (Object.hasOwnProperty.call(events, event)) {
     const eventListener = events[event]?.shift()
 
@@ -40,7 +40,7 @@ Rfid8500Zebra.off = (event) => {
   }
 }
 
-Rfid8500Zebra.removeAll = (event: string) => {
+RfidZebra.removeAll = (event: string) => {
   if (Object.hasOwnProperty.call(events, event)) {
     eventEmitter.removeAllListeners(event)
 
@@ -48,4 +48,4 @@ Rfid8500Zebra.removeAll = (event: string) => {
   }
 }
 
-export default Rfid8500Zebra
+export default RfidZebra
