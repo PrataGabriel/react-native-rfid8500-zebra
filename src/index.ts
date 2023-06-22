@@ -1,5 +1,9 @@
-import { NativeModules, NativeEventEmitter, Platform } from 'react-native'
-import type { Rfid8500ZebraType, EventsType } from '../lib/typescript/index.js'
+import { NativeModules, NativeEventEmitter, Platform, EmitterSubscription } from 'react-native'
+import type Rfid8500ZebraType from 'Rfid8500Zebra'
+
+export interface EventsType {
+  [key: string]: EmitterSubscription[]
+}
 
 const LINKING_ERROR =
   'The package \'react-native-rfid8500-zebra\' doesn\'t seem to be linked. Make sure: \n\n' +
