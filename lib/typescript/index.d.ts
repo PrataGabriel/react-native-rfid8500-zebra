@@ -1,5 +1,5 @@
 declare module 'react-native-rfid8500-zebra' {
-  interface handlerType {
+  interface HandlerType {
     error?: string
     status?: boolean
     distance?: number
@@ -7,25 +7,25 @@ declare module 'react-native-rfid8500-zebra' {
     cause?: string
   }
   
-  interface devicesType {
+  interface DevicesType {
     name?: string
     mac?: string 
   }
   
-  interface deviceDetailsType extends devicesType {
+  interface DeviceDetailsType extends DevicesType {
     antennaLevel?: number
   }
 
   declare const RfidZebra: {
-    on: (event: string, handler: (data: string | string[] | handlerType) => void) => void
+    on: (event: string, handler: (data: string | string[] | HandlerType) => void) => void
     off: (event: string) => void
     removeAll: (event: string) => void
     isConnected: () => Promise<boolean>
-    getDevices: () => Promise<devicesType>
+    getDevices: () => Promise<DevicesType>
     disconnect: () => Promise<boolean>
     reconnect: () => void
     connect: (name: string, mac: string) => Promise<boolean>
-    getDeviceDetails: () => Promise<deviceDetailsType>
+    getDeviceDetails: () => Promise<DeviceDetailsType>
     clear: () => void
     setSingleRead: (enable: boolean) => void
     setAntennaLevel: (antennaLevel: number) => Promise<boolean>
