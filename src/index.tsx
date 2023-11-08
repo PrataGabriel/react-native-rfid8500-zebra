@@ -1,12 +1,14 @@
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native'
 
+import type { EventsType, RfidZebraType } from './internal/types'
+
 const LINKING_ERROR =
   'The package \'react-native-rfid8500-zebra\' doesn\'t seem to be linked. Make sure: \n\n' +
   Platform.select({ ios: '- You have run \'pod install\'\n', default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n'
 
-const Rfid8500Zebra = NativeModules.Rfid8500Zebra
+const RfidZebra: RfidZebraType = NativeModules.Rfid8500Zebra
   ? NativeModules.Rfid8500Zebra
   : new Proxy(
     {},
@@ -19,25 +21,23 @@ const Rfid8500Zebra = NativeModules.Rfid8500Zebra
 
 const eventEmitter = new NativeEventEmitter()
 
-const events: any = {}
+const events: EventsType = {}
 
-Rfid8500Zebra.on = (event: string, handler: (data: any) => void) => {
+RfidZebra.on = (event, handler) => {
   const eventListener = eventEmitter.addListener(event, handler)
 
-  events[event] = events[event]
-    ? [...events[event], eventListener]
-    : [eventListener]
+  events[event] = [...(events[event] || []), eventListener]
 }
 
-Rfid8500Zebra.off = (event: string) => {
+RfidZebra.off = (event) => {
   if (Object.hasOwnProperty.call(events, event)) {
-    const eventListener = events[event].shift()
+    const eventListener = events[event]?.shift()
 
     if (eventListener) eventListener.remove()
   }
 }
 
-Rfid8500Zebra.removeAll = (event: string) => {
+RfidZebra.removeAll = (event: string) => {
   if (Object.hasOwnProperty.call(events, event)) {
     eventEmitter.removeAllListeners(event)
 
@@ -45,4 +45,4 @@ Rfid8500Zebra.removeAll = (event: string) => {
   }
 }
 
-export default Rfid8500Zebra
+export default RfidZebra
