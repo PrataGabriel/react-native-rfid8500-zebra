@@ -1,9 +1,6 @@
-import { NativeModules, NativeEventEmitter, Platform, EmitterSubscription } from 'react-native'
-import type RfidZebraType from 'react-native-rfid8500-zebra'
+import { NativeModules, NativeEventEmitter, Platform } from 'react-native'
 
-export interface EventsType {
-  [key: string]: EmitterSubscription[]
-}
+import type { EventsType, RfidZebraType } from './internal/types'
 
 const LINKING_ERROR =
   'The package \'react-native-rfid8500-zebra\' doesn\'t seem to be linked. Make sure: \n\n' +
@@ -11,7 +8,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n'
 
-const RfidZebra: typeof RfidZebraType = NativeModules.Rfid8500Zebra
+const RfidZebra: RfidZebraType = NativeModules.Rfid8500Zebra
   ? NativeModules.Rfid8500Zebra
   : new Proxy(
     {},
