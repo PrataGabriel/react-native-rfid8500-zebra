@@ -275,3 +275,17 @@ export const useLocateTag = () => {
 
   return [distance, locateTag]
 }
+
+export const useBarCode = () => {
+  const [barCode, setBarCode] = useState<string>('')
+
+  useEffect(() => {
+    RfidZebra.on('BARCODE', (data) => {
+      if (data) {
+        setBarCode(data as string)
+      }
+    })
+  }, [])
+
+  return barCode
+}
