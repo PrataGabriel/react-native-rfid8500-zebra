@@ -171,7 +171,6 @@ export const useReader = () => {
     disconnect: RfidZebra.disconnect,
     reconnect: RfidZebra.reconnect,
     deviceDetails,
-    clearTags: RfidZebra.clear,
     setAntennaLevel,
     setMode,
     softRead: RfidZebra.softReadCancel,
@@ -226,6 +225,11 @@ export const useSingleRead = () => {
 export const useTags = () => {
   const [tags, setTags] = useState<string[]>([])
 
+  const clearTags = (): void => {
+    RfidZebra.clear()
+    setTags([])
+  }
+
   useEffect(() => {
     RfidZebra.on('TAGS', (data) => {
       const tagsList = data as string[]
@@ -234,7 +238,7 @@ export const useTags = () => {
     })
   }, [])
 
-  return tags
+  return [tags, clearTags]
 }
 
 export const useLocateTag = () => {
