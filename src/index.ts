@@ -13,7 +13,6 @@ import type {
   HandlerType,
   IwriteTagStatusState,
   RfidZebraType,
-  TuseWriteTag,
 } from './internal/types'
 
 const LINKING_ERROR =
@@ -91,10 +90,10 @@ const requestPermissions = async (permissions: string | string[]) => {
   )
 }
 
-export const useWriteTag = (): TuseWriteTag => {
+export const useWriteTag = () => {
   const [writeTagStatus, setWriteTagStatus] = useState<IwriteTagStatusState>()
 
-  const setWriteTag = (tag: string, newTag: string) => {
+  const writeTag = (tag: string, newTag: string) => {
     RfidZebra.programTag(tag, newTag)
   }
 
@@ -104,7 +103,7 @@ export const useWriteTag = (): TuseWriteTag => {
     )
   }, [])
 
-  return [writeTagStatus, setWriteTag]
+  return [writeTagStatus, writeTag]
 }
 
 export const useReader = () => {
@@ -195,7 +194,7 @@ export const useDevicesList = () => {
     verifyPermission()
   }, [])
 
-  return [devices, updateDevices]
+  return { devices, updateDevices }
 }
 
 export const useSingleRead = () => {
@@ -243,28 +242,33 @@ export const useTags = () => {
 
 export const useLocateTag = () => {
   const [distance, setDistance] = useState<number>(0)
-  const [readDistance, setReadDistance] = useState<boolean>(false)
+  const [isLocateTag, setIsLocateTag] = useState<boolean>(false)
+  const [tag, setTag] = useState<string>()
 
-  const locateTag = (tag: string): void => {
-    if (!tag) {
-      RfidZebra.enableLocateTag(false, '').then((status) => {
-        if (status) {
-          setReadDistance(false)
-          setDistance(0)
-        }
-      })
-    } else {
+  const start = (tag: string): void => {
+    if (tag) {
       RfidZebra.enableLocateTag(true, tag).then((status) => {
         if (status) {
-          setReadDistance(true)
+          setIsLocateTag(true)
+          setTag(tag)
           setDistance(0)
         }
       })
     }
   }
 
+  const stop = (): void => {
+    RfidZebra.enableLocateTag(false, '').then((status) => {
+      if (status) {
+        setIsLocateTag(false)
+        setTag(undefined)
+        setDistance(0)
+      }
+    })
+  }
+
   useEffect(() => {
-    if (readDistance) {
+    if (isLocateTag) {
       RfidZebra.on('LOCATE_TAG', (data) => {
         const distance = (data as HandlerType)?.distance
 
@@ -275,9 +279,9 @@ export const useLocateTag = () => {
     } else {
       RfidZebra.off('LOCATE_TAG')
     }
-  }, [readDistance])
+  }, [isLocateTag])
 
-  return [distance, locateTag]
+  return { distance, isLocateTag, tag, start, stop }
 }
 
 export const useBarCode = () => {

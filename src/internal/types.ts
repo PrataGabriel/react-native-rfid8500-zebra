@@ -51,8 +51,3 @@ export interface IwriteTagStatusState {
   status?: boolean
   error?: string
 }
-
-export type TuseWriteTag = [
-  IwriteTagStatusState | undefined,
-  (tag: string, newTag: string) => void,
-]
