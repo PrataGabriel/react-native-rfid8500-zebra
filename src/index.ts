@@ -64,17 +64,13 @@ const requestPermissions = async (permissions: string | string[]) => {
   const requests = []
 
   if (Array.isArray(permissions)) {
-    requests.push([
-      ...permissions.map((permission: string) => {
-        const permissionData = PermissionsAndroid.PERMISSIONS[permission]
+    permissions.forEach((permission: string) => {
+      const permissionData = PermissionsAndroid.PERMISSIONS[permission]
 
-        if (permissionData) {
-          return PermissionsAndroid.request(permissionData)
-        }
-
-        return false
-      }),
-    ])
+      if (permissionData) {
+        requests.push(PermissionsAndroid.request(permissionData))
+      }
+    })
   } else {
     const permissionData = PermissionsAndroid.PERMISSIONS[permissions]
 
@@ -161,6 +157,15 @@ export const useReader = () => {
       const status = (data as HandlerType)?.status
 
       setIsConnected(!!status)
+    })
+
+    RfidZebra.on('BATTERY_STATUS', (data) => {
+      const batteryLevel = (data as HandlerType)?.level
+
+      setDeviceDetails((deviceDetails) => ({
+        ...deviceDetails,
+        batteryLevel,
+      }))
     })
   }, [])
 
