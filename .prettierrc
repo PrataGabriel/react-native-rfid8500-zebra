@@ -4,7 +4,7 @@
   "jsxSingleQuote": false,
   "quoteProps": "as-needed",
   "singleQuote": true,
-  "semi": false,
+  "semi": true,
   "printWidth": 100,
   "useTabs": false,
   "tabWidth": 2
