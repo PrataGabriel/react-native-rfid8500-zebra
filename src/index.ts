@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react';
+import type { PermissionStatus } from 'react-native';
 import {
   NativeModules,
   NativeEventEmitter,
   Platform,
   PermissionsAndroid,
-} from 'react-native'
+} from 'react-native';
 
 import type {
   DeviceDetailsType,
@@ -13,13 +14,13 @@ import type {
   HandlerType,
   IwriteTagStatusState,
   RfidZebraType,
-} from './internal/types'
+} from './internal/types';
 
 const LINKING_ERROR =
   "The package 'react-native-rfid8500-zebra' doesn't seem to be linked. Make sure: \n\n" +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n'
+  '- You are not using Expo Go\n';
 
 const RfidZebra: RfidZebraType = NativeModules.Rfid8500Zebra
   ? NativeModules.Rfid8500Zebra
@@ -27,147 +28,147 @@ const RfidZebra: RfidZebraType = NativeModules.Rfid8500Zebra
       {},
       {
         get() {
-          throw new Error(LINKING_ERROR)
+          throw new Error(LINKING_ERROR);
         },
       }
-    )
+    );
 
-const eventEmitter = new NativeEventEmitter()
+const eventEmitter = new NativeEventEmitter();
 
-const events: EventsType = {}
+const events: EventsType = {};
 
 RfidZebra.on = (event, handler) => {
-  const eventListener = eventEmitter.addListener(event, handler)
+  const eventListener = eventEmitter.addListener(event, handler);
 
-  events[event] = [...(events[event] || []), eventListener]
-}
+  events[event] = [...(events[event] || []), eventListener];
+};
 
 RfidZebra.off = (event) => {
   if (Object.hasOwnProperty.call(events, event)) {
-    const eventListener = events[event]?.shift()
+    const eventListener = events[event]?.shift();
 
     if (eventListener) {
-      eventListener.remove()
+      eventListener.remove();
     }
   }
-}
+};
 
 RfidZebra.removeAll = (event: string) => {
   if (Object.hasOwnProperty.call(events, event)) {
-    eventEmitter.removeAllListeners(event)
+    eventEmitter.removeAllListeners(event);
 
-    events[event] = []
+    events[event] = [];
   }
-}
+};
 
 const requestPermissions = async (permissions: string | string[]) => {
-  const requests = []
+  const requests: Promise<PermissionStatus>[] = [];
 
   if (Array.isArray(permissions)) {
     permissions.forEach((permission: string) => {
-      const permissionData = PermissionsAndroid.PERMISSIONS[permission]
+      const permissionData = PermissionsAndroid.PERMISSIONS[permission];
 
       if (permissionData) {
-        requests.push(PermissionsAndroid.request(permissionData))
+        requests.push(PermissionsAndroid.request(permissionData));
       }
-    })
+    });
   } else {
-    const permissionData = PermissionsAndroid.PERMISSIONS[permissions]
+    const permissionData = PermissionsAndroid.PERMISSIONS[permissions];
 
     if (permissionData) {
-      requests.push(PermissionsAndroid.request(permissionData))
+      requests.push(PermissionsAndroid.request(permissionData));
     }
   }
 
-  const granteds = await Promise.all(requests)
+  const granteds = await Promise.all(requests);
 
   return granteds.every(
     (granted) => granted === PermissionsAndroid.RESULTS.GRANTED
-  )
-}
+  );
+};
 
 export const useWriteTag = () => {
-  const [writeTagStatus, setWriteTagStatus] = useState<IwriteTagStatusState>()
+  const [writeTagStatus, setWriteTagStatus] = useState<IwriteTagStatusState>();
 
   const writeTag = (tag: string, newTag: string) => {
-    RfidZebra.programTag(tag, newTag)
-  }
+    RfidZebra.programTag(tag, newTag);
+  };
 
   useEffect(() => {
     RfidZebra.on('WRITE_TAG_STATUS', (data) =>
       setWriteTagStatus(data as IwriteTagStatusState)
-    )
-  }, [])
+    );
+  }, []);
 
-  return [writeTagStatus, writeTag]
-}
+  return [writeTagStatus, writeTag];
+};
 
 export const useReader = () => {
-  const [isConnected, setIsConnected] = useState(false)
-  const [deviceDetails, setDeviceDetails] = useState<DeviceDetailsType>({})
+  const [isConnected, setIsConnected] = useState(false);
+  const [deviceDetails, setDeviceDetails] = useState<DeviceDetailsType>({});
 
   const connect = async (name: string, mac: string): Promise<boolean> => {
     if (deviceDetails?.mac === mac) {
-      await RfidZebra.disconnect()
+      await RfidZebra.disconnect();
     }
 
     if (await RfidZebra.connect(name, mac)) {
-      const deviceDetailsData = await RfidZebra.getDeviceDetails()
+      const deviceDetailsData = await RfidZebra.getDeviceDetails();
 
       setDeviceDetails((deviceDetails) => ({
         ...deviceDetails,
         ...deviceDetailsData,
-      }))
-      RfidZebra.clear()
+      }));
+      RfidZebra.clear();
 
-      return true
+      return true;
     }
 
-    setIsConnected(false)
-    setDeviceDetails({})
+    setIsConnected(false);
+    setDeviceDetails({});
 
-    return false
-  }
+    return false;
+  };
 
   const setAntennaLevel = async (level: number) => {
     if (isConnected) {
-      await RfidZebra.setAntennaLevel(level)
+      await RfidZebra.setAntennaLevel(level);
 
       setDeviceDetails((deviceDetails) => ({
         ...deviceDetails,
         ...{ antennaLevel: level },
-      }))
+      }));
     }
-  }
+  };
 
   const setMode = async (mode: 'RFID' | 'BARCODE') => {
     if (mode === 'RFID') {
-      return await RfidZebra.setEnabled(true)
+      return await RfidZebra.setEnabled(true);
     }
 
     if (mode === 'BARCODE') {
-      return await RfidZebra.setEnabled(false)
+      return await RfidZebra.setEnabled(false);
     }
 
-    return false
-  }
+    return false;
+  };
 
   useEffect(() => {
     RfidZebra.on('READER_STATUS', (data) => {
-      const status = (data as HandlerType)?.status
+      const status = (data as HandlerType)?.status;
 
-      setIsConnected(!!status)
-    })
+      setIsConnected(!!status);
+    });
 
     RfidZebra.on('BATTERY_STATUS', (data) => {
-      const batteryLevel = (data as HandlerType)?.level
+      const batteryLevel = (data as HandlerType)?.level;
 
       setDeviceDetails((deviceDetails) => ({
         ...deviceDetails,
         batteryLevel,
-      }))
-    })
-  }, [])
+      }));
+    });
+  }, []);
 
   return {
     isConnected,
@@ -179,126 +180,126 @@ export const useReader = () => {
     setMode,
     softRead: RfidZebra.softReadCancel,
     setSession: RfidZebra.setSession,
-  }
-}
+  };
+};
 
 export const useDevicesList = () => {
-  const [devices, setDevices] = useState<DevicesType[]>([])
+  const [devices, setDevices] = useState<DevicesType[]>([]);
 
   const verifyPermission = useCallback(async () => {
     if (await requestPermissions(['BLUETOOTH_CONNECT', 'BLUETOOTH_SCAN'])) {
-      setDevices(await RfidZebra.getDevices())
+      setDevices(await RfidZebra.getDevices());
     }
-  }, [requestPermissions])
+  }, [requestPermissions]);
 
   const updateDevices = (): void => {
-    RfidZebra.getDevices().then((devicesList) => setDevices(devicesList))
-  }
+    RfidZebra.getDevices().then((devicesList) => setDevices(devicesList));
+  };
 
   useEffect(() => {
-    verifyPermission()
-  }, [])
+    verifyPermission();
+  }, []);
 
-  return { devices, updateDevices }
-}
+  return { devices, updateDevices };
+};
 
 export const useSingleRead = () => {
-  const [tag, setTag] = useState<string>()
-  const [isSingleRead, setIsSingleRead] = useState(false)
+  const [tag, setTag] = useState<string>();
+  const [isSingleRead, setIsSingleRead] = useState(false);
 
   const setSingleRead = (enable: boolean): void => {
-    setIsSingleRead(enable)
-    RfidZebra.setSingleRead(enable)
-  }
+    setIsSingleRead(enable);
+    RfidZebra.setSingleRead(enable);
+  };
 
   useEffect(() => {
     if (isSingleRead) {
       RfidZebra.on('TAG', (data) => {
-        const tagData = data as string
+        const tagData = data as string;
 
-        setTag(tagData)
-      })
+        setTag(tagData);
+      });
     } else {
-      RfidZebra.off('TAG')
+      RfidZebra.off('TAG');
     }
-  }, [isSingleRead])
+  }, [isSingleRead]);
 
-  return [tag, setSingleRead]
-}
+  return [tag, setSingleRead];
+};
 
 export const useTags = () => {
-  const [tags, setTags] = useState<string[]>([])
+  const [tags, setTags] = useState<string[]>([]);
 
   const clearTags = (): void => {
-    RfidZebra.clear()
-    setTags([])
-  }
+    RfidZebra.clear();
+    setTags([]);
+  };
 
   useEffect(() => {
     RfidZebra.on('TAGS', (data) => {
-      const tagsList = data as string[]
+      const tagsList = data as string[];
 
-      setTags((tags) => [...tags, ...tagsList])
-    })
-  }, [])
+      setTags((tags) => [...tags, ...tagsList]);
+    });
+  }, []);
 
-  return [tags, clearTags]
-}
+  return [tags, clearTags];
+};
 
 export const useLocateTag = () => {
-  const [distance, setDistance] = useState<number>(0)
-  const [isLocateTag, setIsLocateTag] = useState<boolean>(false)
-  const [tag, setTag] = useState<string>()
+  const [distance, setDistance] = useState<number>(0);
+  const [isLocateTag, setIsLocateTag] = useState<boolean>(false);
+  const [tag, setTag] = useState<string>();
 
   const start = (tag: string): void => {
     if (tag) {
       RfidZebra.enableLocateTag(true, tag).then((status) => {
         if (status) {
-          setIsLocateTag(true)
-          setTag(tag)
-          setDistance(0)
+          setIsLocateTag(true);
+          setTag(tag);
+          setDistance(0);
         }
-      })
+      });
     }
-  }
+  };
 
   const stop = (): void => {
     RfidZebra.enableLocateTag(false, '').then((status) => {
       if (status) {
-        setIsLocateTag(false)
-        setTag(undefined)
-        setDistance(0)
+        setIsLocateTag(false);
+        setTag(undefined);
+        setDistance(0);
       }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     if (isLocateTag) {
       RfidZebra.on('LOCATE_TAG', (data) => {
-        const distance = (data as HandlerType)?.distance
+        const distance = (data as HandlerType)?.distance;
 
         if (distance !== undefined && distance !== null) {
-          setDistance(distance)
+          setDistance(distance);
         }
-      })
+      });
     } else {
-      RfidZebra.off('LOCATE_TAG')
+      RfidZebra.off('LOCATE_TAG');
     }
-  }, [isLocateTag])
+  }, [isLocateTag]);
 
-  return { distance, isLocateTag, tag, start, stop }
-}
+  return { distance, isLocateTag, tag, start, stop };
+};
 
 export const useBarCode = () => {
-  const [barCode, setBarCode] = useState<string>('')
+  const [barCode, setBarCode] = useState<string>('');
 
   useEffect(() => {
     RfidZebra.on('BARCODE', (data) => {
       if (data) {
-        setBarCode(data as string)
+        setBarCode(data as string);
       }
-    })
-  }, [])
+    });
+  }, []);
 
-  return barCode
-}
+  return barCode;
+};

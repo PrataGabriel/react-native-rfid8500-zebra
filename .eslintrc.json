@@ -9,6 +9,7 @@
       "eslint:recommended",
       "plugin:react/recommended",
       "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
       "prettier/prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -29,46 +30,46 @@
       "prettier"
   ],
   "rules": {
-    "react/react-in-jsx-scope": "off",
-    "react/function-component-definition": [2, { "namedComponents": "function-declaration" }],
-    "camelcase": ["error", { "properties": "never" }],
-    "spaced-comment": "error",
-    "no-duplicate-imports": "error",
-    "consistent-return": 2,
-    "no-else-return": 1,
-    "no-console": ["error", { "allow": ["warn", "error"] }],
-    "array-callback-return": "error",
-    "eqeqeq": ["error", "always"],
-    "logical-assignment-operators": ["error", "always"],
-    "no-await-in-loop": 1,
-    "curly": ["error", "all"],
-    "constructor-super": "error",
-    "getter-return": "error",
-    "no-constant-condition": "error",
+    "react/react-in-jsx-scope": "off", 
+    "react/function-component-definition": [2, { "namedComponents": "function-declaration" }], 
+    "camelcase": ["error", { "properties": "never" }], 
+    "spaced-comment": "error", 
+    "consistent-return": 2, 
+    "no-else-return": 1, 
+    "no-console": ["error", { "allow": ["warn", "error"] }], 
+    "array-callback-return": "error", 
+    "eqeqeq": ["error", "always"], 
+    "logical-assignment-operators": ["error", "always"], 
+    "no-await-in-loop": 1, 
+    "curly": ["error", "all"], 
+    "constructor-super": "error", 
+    "getter-return": "error", 
+    "no-constant-condition": "error", 
     "no-constant-binary-expression": "error",
-    "prefer-const": [
-    "error",
-      {
-        "destructuring": "any",
-        "ignoreReadBeforeAssign": false
-      }
+    "prefer-const": [ 
+      "error", 
+      { 
+        "destructuring": "any", 
+        "ignoreReadBeforeAssign": false 
+      } 
+    ], 
+    "prettier/prettier": [ 
+      "error", 
+      { 
+        "endOfLine": "auto" 
+      } 
+    ], 
+    "no-unused-vars": "off", 
+    "@typescript-eslint/no-unused-vars": [ 
+      "error", 
+      { 
+        "argsIgnorePattern": "^_", 
+        "varsIgnorePattern": "^_", 
+        "caughtErrorsIgnorePattern": "^_" 
+      } 
     ],
-    "prettier/prettier": [
-      "error",
-      {
-        "semi": false,
-        "endOfLine": "auto"
-      }
-    ],
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      {
-        "argsIgnorePattern": "^_",
-        "varsIgnorePattern": "^_",
-        "caughtErrorsIgnorePattern": "^_"
-      }
-    ],
-    "@typescript-eslint/no-explicit-any": "warn"
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/no-non-null-asserted-optional-chain": "error"
   }
 }
