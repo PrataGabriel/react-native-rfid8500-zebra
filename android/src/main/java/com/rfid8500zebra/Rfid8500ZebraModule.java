@@ -715,7 +715,7 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
         IntentFilter filter = new IntentFilter();
         filter.addAction(actionName);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        this.reactContext.registerReceiver(bReceiver, filter, Context.RECEIVER_EXPORTED);
+        this.reactContext.registerReceiver(bReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
         setDataWedgeProfile();
       }

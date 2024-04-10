@@ -1,6 +1,6 @@
 {
   "name": "react-native-rfid8500-zebra",
-  "version": "0.3.2",
+  "version": "0.2.9",
   "description": "test",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
