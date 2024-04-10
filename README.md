@@ -1,5 +1,7 @@
 # react-native-rfid8500-zebra
 
+teste
+
 ## Installation
 
 ```sh
