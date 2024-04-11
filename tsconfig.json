@@ -1,4 +1,5 @@
 {
+  "extends": "expo-module-scripts/tsconfig.base",
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "baseUrl": "./",
