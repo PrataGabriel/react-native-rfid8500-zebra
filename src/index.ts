@@ -105,6 +105,12 @@ RfidZebra.removeAll = (event: string) => {
   }
 };
 
+const wait = async (timing: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve?.(undefined), timing);
+  });
+};
+
 const requestPermissions = async (permissions: string | string[]) => {
   const granteds: string[] = [];
 
@@ -134,6 +140,8 @@ export const useWriteTag = () => {
   const [writeTagStatus, setWriteTagStatus] = useState<IwriteTagStatusState>();
 
   const writeTag = async (tag: string, newTag: string) => {
+    await wait(5);
+
     await RfidZebra.programTag(tag, newTag);
   };
 
@@ -151,6 +159,8 @@ export const useReader = () => {
   const [deviceDetails, setDeviceDetails] = useState<DeviceDetailsType>({});
 
   const connect = async (name: string, mac: string): Promise<boolean> => {
+    await wait(5);
+
     if (deviceDetails?.mac === mac) {
       await RfidZebra.disconnect();
     }
@@ -174,6 +184,8 @@ export const useReader = () => {
   };
 
   const setAntennaLevel = async (level: number) => {
+    await wait(5);
+
     if (isConnected) {
       await RfidZebra.setAntennaLevel(level);
 
@@ -185,6 +197,8 @@ export const useReader = () => {
   };
 
   const setMode = async (mode: 'RFID' | 'BARCODE') => {
+    await wait(5);
+
     if (mode === 'RFID') {
       return await RfidZebra.setEnabled(true);
     }
@@ -243,6 +257,8 @@ export const useDevicesList = () => {
   }, [requestPermissions]);
 
   const updateDevices = async (): Promise<void> => {
+    await wait(5);
+
     await RfidZebra.getDevices().then((devicesList) => setDevices(devicesList));
   };
 
