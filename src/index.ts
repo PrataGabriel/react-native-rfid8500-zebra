@@ -135,8 +135,8 @@ const requestPermissions = async (permissions: string | string[]) => {
 export const useWriteTag = () => {
   const [writeTagStatus, setWriteTagStatus] = useState<IwriteTagStatusState>();
 
-  const writeTag = (tag: string, newTag: string) => {
-    RfidZebra.programTag(tag, newTag);
+  const writeTag = async (tag: string, newTag: string) => {
+    await RfidZebra.programTag(tag, newTag);
   };
 
   useEffect(() => {
@@ -231,21 +231,24 @@ export const useReader = () => {
 export const useDevicesList = () => {
   const [devices, setDevices] = useState<DevicesType[]>([]);
 
-  const verifyPermission = useCallback(async () => {
-    if (await requestPermissions(['BLUETOOTH_CONNECT', 'BLUETOOTH_SCAN'])) {
+  const requestPermission = useCallback(async () => {
+    const verifyPermission = await requestPermissions([
+      'BLUETOOTH_CONNECT',
+      'BLUETOOTH_SCAN',
+    ]);
+
+    if (verifyPermission) {
       setDevices(await RfidZebra.getDevices());
     }
+
+    return verifyPermission;
   }, [requestPermissions]);
 
-  const updateDevices = (): void => {
-    RfidZebra.getDevices().then((devicesList) => setDevices(devicesList));
+  const updateDevices = async (): Promise<void> => {
+    await RfidZebra.getDevices().then((devicesList) => setDevices(devicesList));
   };
 
-  useEffect(() => {
-    verifyPermission();
-  }, []);
-
-  return { devices, updateDevices };
+  return { devices, updateDevices, requestPermission };
 };
 
 export const useSingleRead = () => {
