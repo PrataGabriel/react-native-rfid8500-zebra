@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { PermissionStatus } from 'react-native';
 import {
   NativeModules,
   NativeEventEmitter,
@@ -107,25 +106,24 @@ RfidZebra.removeAll = (event: string) => {
 };
 
 const requestPermissions = async (permissions: string | string[]) => {
-  const requests: Promise<PermissionStatus>[] = [];
+  const granteds: string[] = [];
 
   if (Array.isArray(permissions)) {
-    permissions.forEach((permission: string) => {
+    for (const permission of permissions) {
       const permissionData = PermissionsAndroid.PERMISSIONS[permission];
 
       if (permissionData) {
-        requests.push(PermissionsAndroid.request(permissionData));
+        // eslint-disable-next-line no-await-in-loop
+        granteds.push(await PermissionsAndroid.request(permissionData));
       }
-    });
+    }
   } else {
     const permissionData = PermissionsAndroid.PERMISSIONS[permissions];
 
     if (permissionData) {
-      requests.push(PermissionsAndroid.request(permissionData));
+      granteds.push(await PermissionsAndroid.request(permissionData));
     }
   }
-
-  const granteds = await Promise.all(requests);
 
   return granteds.every(
     (granted) => granted === PermissionsAndroid.RESULTS.GRANTED
