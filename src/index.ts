@@ -183,6 +183,19 @@ export const useReader = () => {
     return false;
   };
 
+  const disconnect = async (): Promise<boolean> => {
+    await wait(5);
+
+    if (await RfidZebra.disconnect()) {
+      setDeviceDetails({});
+      setIsConnected(false);
+
+      return true;
+    }
+
+    return false;
+  };
+
   const setAntennaLevel = async (level: number) => {
     await wait(5);
 
@@ -230,7 +243,7 @@ export const useReader = () => {
   return {
     isConnected,
     connect,
-    disconnect: RfidZebra.disconnect,
+    disconnect,
     reconnect: RfidZebra.reconnect,
     deviceDetails,
     setAntennaLevel,
