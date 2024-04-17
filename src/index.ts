@@ -174,6 +174,8 @@ export const useReader = () => {
       }));
       RfidZebra.clear();
 
+      setIsConnected(true);
+
       return true;
     }
 
@@ -225,9 +227,13 @@ export const useReader = () => {
 
   useEffect(() => {
     RfidZebra.on('READER_STATUS', (data) => {
-      const status = (data as HandlerType)?.status;
+      const readerData = data as HandlerType;
 
-      setIsConnected(!!status);
+      if (readerData?.status && Object.keys(deviceDetails).length > 0) {
+        setIsConnected(true);
+      } else if (!readerData?.status && readerData?.error) {
+        setIsConnected(false);
+      }
     });
 
     RfidZebra.on('BATTERY_STATUS', (data) => {
@@ -239,6 +245,12 @@ export const useReader = () => {
       }));
     });
   }, []);
+
+  useEffect(() => {
+    if (!isConnected) {
+      setDeviceDetails({});
+    }
+  }, [isConnected]);
 
   return {
     isConnected,
