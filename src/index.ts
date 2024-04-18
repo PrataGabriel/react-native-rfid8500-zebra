@@ -157,6 +157,7 @@ export const useWriteTag = () => {
 };
 
 export const useReader = () => {
+  const [reconnecting, setReconnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [deviceDetails, setDeviceDetails] = useState<DeviceDetailsType>({});
 
@@ -231,15 +232,32 @@ export const useReader = () => {
     RfidZebra.on('READER_STATUS', (data) => {
       const readerData = data as HandlerType;
 
-      if (readerData?.status && Object.keys(deviceDetails).length > 0) {
-        setIsConnected(true);
-      } else if (
-        !readerData?.status &&
-        readerData?.error &&
-        readerData?.type === 'event'
-      ) {
-        setIsConnected(false);
-      }
+      setReconnecting((reconnecting) => {
+        if (
+          readerData?.status &&
+          (Object.keys(deviceDetails).length > 0 || reconnecting)
+        ) {
+          RfidZebra.getDeviceDetails().then((deviceDetailsData) => {
+            setDeviceDetails((deviceDetails) => ({
+              ...deviceDetails,
+              ...deviceDetailsData,
+            }));
+
+            setIsConnected(true);
+          });
+        } else if (!readerData?.status) {
+          if (readerData?.type === 'event' && !reconnecting) {
+            RfidZebra.reconnect();
+
+            setIsConnected(false);
+            return true;
+          }
+
+          setIsConnected(false);
+        }
+
+        return readerData?.type !== 'event' ? false : reconnecting;
+      });
     });
 
     RfidZebra.on('BATTERY_STATUS', (data) => {
@@ -253,7 +271,7 @@ export const useReader = () => {
   }, []);
 
   useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected && !reconnecting) {
       setDeviceDetails({});
     }
   }, [isConnected]);
