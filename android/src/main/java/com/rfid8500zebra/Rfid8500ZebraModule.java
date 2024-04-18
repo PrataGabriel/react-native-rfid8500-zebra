@@ -343,7 +343,8 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
 
           WritableMap map = Arguments.createMap();
           map.putBoolean("status", true);
-          map.putString("error", null);
+          map.putString("errorMessage", null);
+          map.putBoolean("error", false);
           sendEvent(WRITE_TAG_STATUS, map);
         }
       } else {
@@ -352,12 +353,14 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
     } catch (InvalidUsageException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getInfo());
+      map.putString("errorMessage", err.getInfo());
+      map.putBoolean("error", true);
       sendEvent(WRITE_TAG_STATUS, map);
     } catch (OperationFailureException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getResults().toString());
+      map.putString("errorMessage", err.getResults().toString());
+      map.putBoolean("error", true);
       sendEvent(WRITE_TAG_STATUS, map);
     } catch (Exception err) {
       promise.reject(err);
@@ -551,7 +554,9 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
 
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", false);
-        map.putString("error", null);
+        map.putString("type", "event");
+        map.putString("errorMessage", null);
+        map.putBoolean("error", false);
         sendEvent(READER_STATUS, map);
       }
     }
@@ -722,12 +727,14 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
 
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", true);
-      map.putString("error", null);
+      map.putString("errorMessage", null);
+      map.putBoolean("error", false);
       sendEvent(READER_STATUS, map);
     } catch (InvalidUsageException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getInfo());
+      map.putString("errorMessage", err.getInfo());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     } catch (OperationFailureException err) {
       if (err.getResults() == RFIDResults.RFID_READER_REGION_NOT_CONFIGURED) {
@@ -737,13 +744,15 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
       } else {
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", false);
-        map.putString("error", err.getResults().toString());
+        map.putString("errorMessage", err.getResults().toString());
+        map.putBoolean("error", true);
         sendEvent(READER_STATUS, map);
       }
     } catch (Exception err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getMessage());
+      map.putString("errorMessage", err.getMessage());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     }
   }
@@ -757,22 +766,26 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
 
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", true);
-        map.putString("error", null);
+        map.putString("errorMessage", null);
+        map.putBoolean("error", false);
         sendEvent(READER_STATUS, map);
       } catch (OperationFailureException err) {
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", false);
-        map.putString("error", err.getResults().toString());
+        map.putString("errorMessage", err.getResults().toString());
+        map.putBoolean("error", true);
         sendEvent(READER_STATUS, map);
       } catch (InvalidUsageException err) {
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", false);
-        map.putString("error", err.getInfo());
+        map.putString("errorMessage", err.getInfo());
+        map.putBoolean("error", true);
         sendEvent(READER_STATUS, map);
       } catch (Exception err) {
         WritableMap map = Arguments.createMap();
         map.putBoolean("status", false);
-        map.putString("error", err.getMessage());
+        map.putString("errorMessage", err.getMessage());
+        map.putBoolean("error", true);
         sendEvent(READER_STATUS, map);
       }
     }
@@ -816,22 +829,26 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
 
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", null);
+      map.putString("errorMessage", null);
+      map.putBoolean("error", false);
       sendEvent(READER_STATUS, map);
     } catch (OperationFailureException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getResults().toString());
+      map.putString("errorMessage", err.getResults().toString());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     } catch (InvalidUsageException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getInfo());
+      map.putString("errorMessage", err.getInfo());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     } catch (Exception err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getMessage());
+      map.putString("errorMessage", err.getMessage());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     }
   }
@@ -966,12 +983,14 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
     } catch (OperationFailureException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getResults().toString());
+      map.putString("errorMessage", err.getResults().toString());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     } catch (InvalidUsageException err) {
       WritableMap map = Arguments.createMap();
       map.putBoolean("status", false);
-      map.putString("error", err.getInfo());
+      map.putString("errorMessage", err.getInfo());
+      map.putBoolean("error", true);
       sendEvent(READER_STATUS, map);
     }
   }
@@ -1027,11 +1046,13 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
             protected void onPostExecute(Boolean result) {
               if (invalidUsageException != null) {
                 WritableMap map = Arguments.createMap();
-                map.putString("error", invalidUsageException.getInfo());
+                map.putString("errorMessage", invalidUsageException.getInfo());
+                map.putBoolean("error", true);
                 sendEvent(LOCATE_TAG, map);
               } else if (operationFailureException != null) {
                 WritableMap map = Arguments.createMap();
-                map.putString("error", operationFailureException.getVendorMessage());
+                map.putString("errorMessage", operationFailureException.getVendorMessage());
+                map.putBoolean("error", true);
                 sendEvent(LOCATE_TAG, map);
               }
             }
@@ -1062,11 +1083,12 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
           protected void onPostExecute(Boolean result) {
             if (invalidUsageException != null) {
               WritableMap map = Arguments.createMap();
-              map.putString("error", invalidUsageException.getInfo());
+              map.putString("errorMessage", invalidUsageException.getInfo());
+              map.putBoolean("error", true);
               sendEvent(LOCATE_TAG, map);
             } else if (operationFailureException != null) {
               WritableMap map = Arguments.createMap();
-              map.putString("error", operationFailureException.getVendorMessage());
+              map.putString("errorMessage", operationFailureException.getVendorMessage());
               sendEvent(LOCATE_TAG, map);
             }
           }

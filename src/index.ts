@@ -9,7 +9,9 @@ import {
 import type { EmitterSubscription } from 'react-native';
 
 export interface HandlerType {
-  error?: string;
+  type?: string;
+  errorMessage?: string;
+  error?: boolean;
   status?: boolean;
   distance?: number;
   level?: number;
@@ -231,7 +233,11 @@ export const useReader = () => {
 
       if (readerData?.status && Object.keys(deviceDetails).length > 0) {
         setIsConnected(true);
-      } else if (!readerData?.status && readerData?.error) {
+      } else if (
+        !readerData?.status &&
+        readerData?.error &&
+        readerData?.type === 'event'
+      ) {
         setIsConnected(false);
       }
     });
