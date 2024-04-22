@@ -298,10 +298,6 @@ export const useDevicesList = () => {
       'BLUETOOTH_SCAN',
     ]);
 
-    if (verifyPermission) {
-      setDevices(await RfidZebra.getDevices());
-    }
-
     return verifyPermission;
   }, [requestPermissions]);
 
