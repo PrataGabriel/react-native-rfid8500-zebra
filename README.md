@@ -15,24 +15,34 @@ import { useReader, useDevicesList } from 'react-native-rfid8500-zebra';
 
 function App() {
   // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { connect } = useReader();
   // Lista de dispositivos pareados.
-  const devicesList = useDevicesList();
+  const { devices, updateDevices, requestPermission } = useDevicesList();
 
   useEffect(() => {
-    console.log(devicesList.devices);
-    // [{"mac": "84:C6:92:41:3C:4B", "name": "RFD850022260520100556"}]
-
-    const { name, mac } = devicesList.devices[0];
-
-    reader.connect(name, mac).then((status) => {
-      if (status) {
-        // Conectado
-      } else {
-        // Erro ao conectar
+    requestPermission().then(async (granted) => {
+      if (granted) {
+        await updateDevices();
       }
     });
-  }, [devicesList.devices]);
+  }, []);
+
+  useEffect(() => {
+    console.log(devices);
+    // [{"mac": "84:C6:92:41:3C:4B", "name": "RFD850022260520100556"}]
+
+    if (devices.length > 0) {
+      const { name, mac } = devices[0];
+
+      connect(name, mac).then((status) => {
+        if (status) {
+          // Conectado
+        } else {
+          // Erro ao conectar
+        }
+      });
+    }
+  }, [devices]);
 }
 ```
 
@@ -43,24 +53,17 @@ import { useReader, useDevicesList } from 'react-native-rfid8500-zebra';
 
 function App() {
   // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
-  // Lista de dispositivos pareados.
-  const devicesList = useDevicesList();
+  const { disconnect } = useReader();
 
   useEffect(() => {
-    console.log(devicesList.devices);
-    // [{"mac": "84:C6:92:41:3C:4B", "name": "RFD850022260520100556"}]
-
-    const { name, mac } = devicesList.devices[0];
-
-    reader.disconnect().then((status) => {
+    disconnect().then((status) => {
       if (status) {
         // Desconectado
       } else {
         // Erro ao desconectar
       }
     });
-  }, [devicesList.devices]);
+  }, []);
 }
 ```
 
@@ -71,20 +74,20 @@ import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
   // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { deviceDetails } = useReader();
 
   // conecte o dispositivo antes
 
   useEffect(() => {
     // Informações do dispositivo conectado
-    console.log(reader.deviceDetails);
+    console.log(deviceDetails);
     // {
     //   name: "RFD850022260520100556"
     //   mac: "84:C6:92:41:3C:4B"
     //   antennaLevel: 27
     //   batteryLevel: 80
     // }
-  }, [reader.deviceDetails]);
+  }, [deviceDetails]);
 }
 ```
 
@@ -95,17 +98,17 @@ import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
   // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { isConnected, setAntennaLevel } = useReader();
 
   // conecte o dispositivo antes
 
   useEffect(() => {
     // Altera o nível da antena
     // 1 - 30
-    reader.setAntennaLevel(15).then(() => {
+    setAntennaLevel(15).then(() => {
       // Atualizado
     });
-  }, [reader.isConnected]);
+  }, [isConnected]);
 }
 ```
 
@@ -115,8 +118,6 @@ function App() {
 import { useReader, useTags } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
   const [tags, clearTags] = useTags();
 
   // conecte o dispositivo antes
@@ -141,22 +142,21 @@ function App() {
 import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { isConnected, softRead } = useReader();
 
   // conecte o dispositivo antes
 
   useEffect(() => {
     // Forçar leitura
-    reader.softRead(true).then(() => {
+    softRead(true).then(() => {
       // Iniciou a leitura
     });
 
     // Cancelar leitura
-    reader.softRead(false).then(() => {
+    softRead(false).then(() => {
       // Cancelou a leitura
     });
-  }, [reader.isConnected]);
+  }, [isConnected]);
 }
 ```
 
@@ -166,27 +166,26 @@ function App() {
 import { useReader, useLocateTag } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
-  const locateTag = useLocateTag();
+  const { isConnected } = useReader();
+  const { start, stop, isLocateTag, distance } = useLocateTag();
 
   // conecte o dispositivo antes
 
   useEffect(() => {
     // Inicia a busca de uma etiqueta
-    locateTag.start('ASDH12358012308ASD');
+    start('ASDH12358012308ASD');
 
     // Para a busca de uma etiqueta
-    locateTag.stop();
-  }, [reader.isConnected]);
+    stop();
+  }, [isConnected]);
 
   useEffect(() => {
-    if (locateTag.isLocateTag) {
+    if (isLocateTag) {
       // Retorna a distância de uma etiqueta.
-      console.log(locateTag.distance);
+      console.log(distance);
       // 0 - 100
     }
-  }, [locateTag.isLocateTag, locateTag.distance]);
+  }, [isLocateTag, distance]);
 }
 ```
 
@@ -196,8 +195,7 @@ function App() {
 import { useReader, useSingleRead } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { isConnected } = useReader();
   const [tag, setSingleRead] = useSingleRead();
 
   // conecte o dispositivo antes
@@ -208,7 +206,7 @@ function App() {
 
     // Desativa o modo de leitura única
     setSingleRead(false);
-  }, [reader.isConnected]);
+  }, [isConnected]);
 
   useEffect(() => {
     console.log(tag);
@@ -223,19 +221,18 @@ function App() {
 import { useReader, useBarCode } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
-  const reader = useReader();
+  const { isConnected, setMode } = useReader();
   const barCode = useBarCode();
 
   // conecte o dispositivo antes
 
   useEffect(() => {
     // Ativa o modo de código de barras
-    reader.setMode('BARCODE');
+    setMode('BARCODE');
 
     // Ativa o modo de RFID
-    setSingleRead('RFID');
-  }, [reader.isConnected]);
+    setMode('RFID');
+  }, [isConnected]);
 
   useEffect(() => {
     console.log(barCode);

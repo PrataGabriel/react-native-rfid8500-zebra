@@ -62,6 +62,13 @@ export interface IwriteTagStatusState {
   error?: string;
 }
 
+export type UseSingleRead = () => [
+  string | undefined,
+  (enable: boolean) => void,
+];
+
+export type UseTags = () => [string[], () => void];
+
 const LINKING_ERROR =
   "The package 'react-native-rfid8500-zebra' doesn't seem to be linked. Make sure: \n\n" +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -310,7 +317,7 @@ export const useDevicesList = () => {
   return { devices, updateDevices, requestPermission };
 };
 
-export const useSingleRead = () => {
+export const useSingleRead: UseSingleRead = () => {
   const [tag, setTag] = useState<string>();
   const [isSingleRead, setIsSingleRead] = useState(false);
 
@@ -334,7 +341,7 @@ export const useSingleRead = () => {
   return [tag, setSingleRead];
 };
 
-export const useTags = () => {
+export const useTags: UseTags = () => {
   const [tags, setTags] = useState<string[]>([]);
 
   const clearTags = (): void => {
@@ -398,7 +405,7 @@ export const useLocateTag = () => {
 };
 
 export const useBarCode = () => {
-  const [barCode, setBarCode] = useState<string>('');
+  const [barCode, setBarCode] = useState<string>();
 
   useEffect(() => {
     RfidZebra.on('BARCODE', (data) => {
