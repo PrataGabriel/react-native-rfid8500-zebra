@@ -166,6 +166,7 @@ export const useWriteTag = () => {
 export const useReader = () => {
   const [reconnecting, setReconnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [triggerStatus, setTriggerStatus] = useState(false);
   const [deviceDetails, setDeviceDetails] = useState<DeviceDetailsType>({});
 
   const connect = async (name: string, mac: string): Promise<boolean> => {
@@ -209,15 +210,19 @@ export const useReader = () => {
   };
 
   const setAntennaLevel = async (level: number) => {
-    await wait(5);
+    try {
+      await wait(5);
 
-    if (isConnected) {
-      await RfidZebra.setAntennaLevel(level);
+      if (isConnected) {
+        await RfidZebra.setAntennaLevel(level);
 
-      setDeviceDetails((deviceDetails) => ({
-        ...deviceDetails,
-        ...{ antennaLevel: level },
-      }));
+        setDeviceDetails((deviceDetails) => ({
+          ...deviceDetails,
+          ...{ antennaLevel: level },
+        }));
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -275,6 +280,12 @@ export const useReader = () => {
         batteryLevel,
       }));
     });
+
+    RfidZebra.on('TRIGGER_STATUS', (data) => {
+      const triggerDataStatus = data as HandlerType;
+
+      setTriggerStatus(!!triggerDataStatus?.status);
+    });
   }, []);
 
   useEffect(() => {
@@ -287,6 +298,7 @@ export const useReader = () => {
     isConnected,
     connect,
     disconnect,
+    triggerStatus,
     reconnect: RfidZebra.reconnect,
     deviceDetails,
     setAntennaLevel,

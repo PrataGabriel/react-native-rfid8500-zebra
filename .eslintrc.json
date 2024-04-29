@@ -51,6 +51,7 @@
     "getter-return": "error", 
     "no-constant-condition": "error", 
     "no-constant-binary-expression": "error",
+    "no-useless-catch": "off",
     "prefer-const": [ 
       "error", 
       { 
