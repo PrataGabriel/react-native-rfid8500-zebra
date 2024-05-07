@@ -11,17 +11,23 @@ npm install react-native-rfid8500-zebra
 ## Conectando a um dispositivo
 
 ```js
-import { useReader, useDevicesList } from 'react-native-rfid8500-zebra';
+import { useEffect } from 'react';
+import { PermissionsAndroid } from 'react-native';
+import {
+  useReader,
+  useDevicesList,
+  useReaderPermissions,
+} from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
   const { connect } = useReader();
   // Lista de dispositivos pareados.
-  const { devices, updateDevices, requestPermission } = useDevicesList();
+  const { devices, updateDevices } = useDevicesList();
+  const [permission, requestPermission] = useReaderPermissions();
 
   useEffect(() => {
-    requestPermission().then(async (granted) => {
-      if (granted) {
+    requestPermission().then(async (result) => {
+      if (result === PermissionsAndroid.RESULTS.GRANTED) {
         await updateDevices();
       }
     });
@@ -49,10 +55,10 @@ function App() {
 ## Desconectando de um dispositivo
 
 ```js
+import { useEffect } from 'react';
 import { useReader, useDevicesList } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
   const { disconnect } = useReader();
 
   useEffect(() => {
@@ -70,10 +76,10 @@ function App() {
 ## Capturando informações do dispositivo
 
 ```js
+import { useEffect } from 'react';
 import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
   const { deviceDetails } = useReader();
 
   // conecte o dispositivo antes
@@ -94,10 +100,10 @@ function App() {
 ## Alterar nível da antena
 
 ```js
+import { useEffect } from 'react';
 import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
-  // Ao utilizar o useReader, automáticamente será requisitado as permissões necessárias do bluetooth
   const { isConnected, setAntennaLevel } = useReader();
 
   // conecte o dispositivo antes
@@ -115,6 +121,7 @@ function App() {
 ## Capturar as etiquetas lidas
 
 ```js
+import { useEffect } from 'react';
 import { useReader, useTags } from 'react-native-rfid8500-zebra';
 
 function App() {
@@ -139,6 +146,7 @@ function App() {
 ## Forçar o leitor a iniciar a leitura
 
 ```js
+import { useEffect } from 'react';
 import { useReader } from 'react-native-rfid8500-zebra';
 
 function App() {
@@ -163,6 +171,7 @@ function App() {
 ## Localizar uma etiqueta através de distancia
 
 ```js
+import { useEffect } from 'react';
 import { useReader, useLocateTag } from 'react-native-rfid8500-zebra';
 
 function App() {
@@ -192,6 +201,7 @@ function App() {
 ## Ler uma etiqueta de cada vez
 
 ```js
+import { useEffect } from 'react';
 import { useReader, useSingleRead } from 'react-native-rfid8500-zebra';
 
 function App() {
@@ -218,6 +228,7 @@ function App() {
 ## Modo código de barra
 
 ```js
+import { useEffect } from 'react';
 import { useReader, useBarCode } from 'react-native-rfid8500-zebra';
 
 function App() {

@@ -6,7 +6,7 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 
-import type { EmitterSubscription } from 'react-native';
+import type { EmitterSubscription, PermissionStatus } from 'react-native';
 
 export interface HandlerType {
   type?: string;
@@ -67,6 +67,11 @@ export type UseSingleRead = () => [
   (enable: boolean) => void,
 ];
 
+export type UseReaderPermissions = () => [
+  PermissionStatus | undefined,
+  () => Promise<PermissionStatus | undefined>,
+];
+
 export type UseTags = () => [string[], () => void];
 
 const LINKING_ERROR =
@@ -120,29 +125,34 @@ const wait = async (timing: number) => {
   });
 };
 
-const requestPermissions = async (permissions: string | string[]) => {
-  const granteds: string[] = [];
+export const useReaderPermissions: UseReaderPermissions = () => {
+  const [permission, setPermission] = useState<PermissionStatus>();
 
-  if (Array.isArray(permissions)) {
-    for (const permission of permissions) {
-      const permissionData = PermissionsAndroid.PERMISSIONS[permission];
+  const requestPermission = useCallback(async () => {
+    const results = await PermissionsAndroid.requestMultiple([
+      'android.permission.BLUETOOTH_CONNECT',
+      'android.permission.BLUETOOTH_SCAN',
+    ]);
+    let resultPermission = PermissionsAndroid.RESULTS.GRANTED;
 
-      if (permissionData) {
-        // eslint-disable-next-line no-await-in-loop
-        granteds.push(await PermissionsAndroid.request(permissionData));
+    Object.values(results).some((result) => {
+      if (result === PermissionsAndroid.RESULTS['NEVER_ASK_AGAIN']) {
+        resultPermission = PermissionsAndroid.RESULTS['NEVER_ASK_AGAIN'];
+
+        return true;
+      } else if (result === PermissionsAndroid.RESULTS.DENIED) {
+        resultPermission = PermissionsAndroid.RESULTS.DENIED;
       }
-    }
-  } else {
-    const permissionData = PermissionsAndroid.PERMISSIONS[permissions];
 
-    if (permissionData) {
-      granteds.push(await PermissionsAndroid.request(permissionData));
-    }
-  }
+      return false;
+    });
 
-  return granteds.every(
-    (granted) => granted === PermissionsAndroid.RESULTS.GRANTED
-  );
+    setPermission(resultPermission);
+
+    return resultPermission;
+  }, []);
+
+  return [permission, requestPermission];
 };
 
 export const useWriteTag = () => {
@@ -311,22 +321,13 @@ export const useReader = () => {
 export const useDevicesList = () => {
   const [devices, setDevices] = useState<DevicesType[]>([]);
 
-  const requestPermission = useCallback(async () => {
-    const verifyPermission = await requestPermissions([
-      'BLUETOOTH_CONNECT',
-      'BLUETOOTH_SCAN',
-    ]);
-
-    return verifyPermission;
-  }, [requestPermissions]);
-
   const updateDevices = async (): Promise<void> => {
     await wait(5);
 
     await RfidZebra.getDevices().then((devicesList) => setDevices(devicesList));
   };
 
-  return { devices, updateDevices, requestPermission };
+  return { devices, updateDevices };
 };
 
 export const useSingleRead: UseSingleRead = () => {

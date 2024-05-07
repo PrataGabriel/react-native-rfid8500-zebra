@@ -1,6 +1,6 @@
 {
   "name": "react-native-rfid8500-zebra",
-  "version": "0.4.8",
+  "version": "0.5.0",
   "description": "RFID Zebra Reader",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
