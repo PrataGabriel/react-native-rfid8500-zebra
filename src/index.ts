@@ -6,7 +6,11 @@ import {
   PermissionsAndroid,
 } from 'react-native';
 
-import type { EmitterSubscription, PermissionStatus } from 'react-native';
+import type {
+  EmitterSubscription,
+  Permission,
+  PermissionStatus,
+} from 'react-native';
 
 export interface HandlerType {
   type?: string;
@@ -128,11 +132,13 @@ const wait = async (timing: number) => {
 export const useReaderPermissions: UseReaderPermissions = () => {
   const [permission, setPermission] = useState<PermissionStatus>();
 
+  const permissionsList: Array<Permission> = [
+    'android.permission.BLUETOOTH_CONNECT',
+    'android.permission.BLUETOOTH_SCAN',
+  ];
+
   const requestPermission = useCallback(async () => {
-    const results = await PermissionsAndroid.requestMultiple([
-      'android.permission.BLUETOOTH_CONNECT',
-      'android.permission.BLUETOOTH_SCAN',
-    ]);
+    const results = await PermissionsAndroid.requestMultiple(permissionsList);
     let resultPermission = PermissionsAndroid.RESULTS.GRANTED;
 
     Object.values(results).some((result) => {
@@ -150,6 +156,23 @@ export const useReaderPermissions: UseReaderPermissions = () => {
     setPermission(resultPermission);
 
     return resultPermission;
+  }, []);
+
+  const checkPermissions = useCallback(
+    async (permissions: Array<Permission>) => {
+      const results = await Promise.all(
+        permissions.map((permission) => PermissionsAndroid.check(permission))
+      );
+
+      if (results.every((result) => result)) {
+        setPermission(PermissionsAndroid.RESULTS.GRANTED);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    checkPermissions(permissionsList);
   }, []);
 
   return [permission, requestPermission];
