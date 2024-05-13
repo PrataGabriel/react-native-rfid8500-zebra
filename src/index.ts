@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   NativeModules,
   NativeEventEmitter,
   Platform,
   PermissionsAndroid,
+  AppState,
 } from 'react-native';
 
 import type {
@@ -130,6 +131,8 @@ const wait = async (timing: number) => {
 };
 
 export const useReaderPermissions: UseReaderPermissions = () => {
+  const appState = useRef(AppState.currentState);
+
   const [permission, setPermission] = useState<PermissionStatus>();
 
   const permissionsList: Array<Permission> = [
@@ -166,14 +169,41 @@ export const useReaderPermissions: UseReaderPermissions = () => {
 
       if (results.every((result) => result)) {
         setPermission(PermissionsAndroid.RESULTS.GRANTED);
+      } else {
+        setPermission(PermissionsAndroid.RESULTS['NEVER_ASK_AGAIN']);
       }
     },
     []
   );
 
+  const AppStateChangeEvent = () => {
+    return AppState.addEventListener('change', async (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === 'active'
+      ) {
+        if (permission && permission !== PermissionsAndroid.RESULTS.GRANTED) {
+          await checkPermissions(permissionsList);
+        }
+      }
+
+      appState.current = nextAppState;
+    });
+  };
+
   useEffect(() => {
     checkPermissions(permissionsList);
-  }, []);
+  }, [checkPermissions]);
+
+  useEffect(() => {
+    if (permission && permission !== PermissionsAndroid.RESULTS.GRANTED) {
+      const subscription = AppStateChangeEvent();
+
+      return () => subscription.remove();
+    }
+
+    return () => {};
+  }, [permission]);
 
   return [permission, requestPermission];
 };
