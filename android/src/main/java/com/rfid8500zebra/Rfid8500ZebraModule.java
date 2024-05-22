@@ -424,6 +424,15 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
   }
 
   @ReactMethod
+  public void setBeeperQuiet(boolean enable) {
+    if (enable) {
+      reader.Config.setBeeperVolume(BEEPER_VOLUME.QUIET_BEEP);
+    } else {
+      reader.Config.setBeeperVolume(BEEPER_VOLUME.HIGH_BEEP);
+    }
+  }
+
+  @ReactMethod
   public void setSession(int session, Promise promise) {
     try {
       SESSION ses = SESSION.SESSION_S0;

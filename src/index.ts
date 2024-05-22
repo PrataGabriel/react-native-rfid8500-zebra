@@ -60,6 +60,7 @@ export interface RfidZebraType {
   enableLocateTag: (enable: boolean, tag: string) => Promise<boolean>;
   softReadCancel: (enable: boolean) => Promise<void>; // Ativa ou desativa o modo leitura
   setSession: (session: number) => Promise<boolean>;
+  setBeeperQuiet: (enable: boolean) => void;
 }
 
 export interface IwriteTagStatusState {
@@ -368,6 +369,7 @@ export const useReader = () => {
     setMode,
     softRead: RfidZebra.softReadCancel,
     setSession: RfidZebra.setSession,
+    setBeeperQuiet: RfidZebra.setBeeperQuiet,
   };
 };
 
