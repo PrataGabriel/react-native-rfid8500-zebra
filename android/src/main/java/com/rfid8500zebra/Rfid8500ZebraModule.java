@@ -424,7 +424,7 @@ public class Rfid8500ZebraModule extends ReactContextBaseJavaModule implements L
   }
 
   @ReactMethod
-  public void setBeeperQuiet(boolean enable) {
+  public void setBeeperQuiet(boolean enable) throws Exception {
     if (enable) {
       reader.Config.setBeeperVolume(BEEPER_VOLUME.QUIET_BEEP);
     } else {
