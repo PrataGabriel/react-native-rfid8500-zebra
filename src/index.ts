@@ -193,10 +193,6 @@ export const useReaderPermissions: UseReaderPermissions = () => {
   };
 
   useEffect(() => {
-    checkPermissions(permissionsList);
-  }, [checkPermissions]);
-
-  useEffect(() => {
     if (permission && permission !== PermissionsAndroid.RESULTS.GRANTED) {
       const subscription = AppStateChangeEvent();
 
